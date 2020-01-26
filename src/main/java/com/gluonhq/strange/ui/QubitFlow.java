@@ -34,12 +34,9 @@ package com.gluonhq.strange.ui;
 import com.gluonhq.strange.gate.*;
 import com.gluonhq.strange.simulator.Model;
 import com.gluonhq.strange.Gate;
-import com.gluonhq.strange.simulator.local.LocalSimulator;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.LinkedList;
+import java.util.List;
 
 import javafx.beans.*;
 import javafx.collections.FXCollections;
@@ -67,6 +64,7 @@ public class QubitFlow extends Region {
         setText(null);
     }};
 
+    private List<Node> needToFront = new LinkedList<>();
     private Line line = new Line();
     private Line measuredLine = new Line();
 
@@ -93,7 +91,8 @@ public class QubitFlow extends Region {
         gateRow.getStyleClass().add("gate-row");
         title.getStyleClass().add("title");
         title.setPrefWidth(85);
-
+//gateRow.setStyle("-fx-background-color: #FFFFFF00; -fx-border-color:darkgray;");
+//allGates.setStyle("-fx-background-color: #FFFFFF00; -fx-border-color:darkgray;");
         line.endXProperty().bind(widthProperty());
         line.getStyleClass().add("wire");
         measuredLine.endXProperty().bind(widthProperty());
@@ -234,13 +233,41 @@ public class QubitFlow extends Region {
     public boolean wantsOnTop() {
         return askOnTop;
     }
+
+    public List<Node> getNeedToFront() {
+        return needToFront;
+    }
+
     public GateSymbol addGate(Gate gate) {
         if (gateRow.getChildren().isEmpty()) {
             gateRow.getChildren().add(SPACER);
         }
         GateSymbol symbol = GateSymbol.of(gate);;
-        if (gate instanceof Oracle) {
+
+      //  GateSymbol symbol = GateSymbol.of(gate);
+        int spacerIndex = gateRow.getChildren().indexOf(SPACER);
+        if (spacerIndex < 0) {
+            gateRow.getChildren().add(symbol);
+        } else {
+            gateRow.getChildren().set(spacerIndex, symbol);
+        }
+        if (gate instanceof com.gluonhq.strange.gate.Measurement) {
+            measuredLine.translateXProperty().bind(symbol.layoutXProperty().add(allGates.layoutXProperty()));
+            measuredLine.setVisible(true);
+        }  if (gate instanceof Oracle) {
             this.askOnTop = true;
+            Rectangle r = new Rectangle(0,0,40,symbol.spanWires * 66 -16);
+            r.setFill(Color.GREEN);
+            r.setManaged(false);
+            needToFront.add(r);
+            r.layoutXProperty().bind(symbol.layoutXProperty());
+            r.layoutYProperty().bind(symbol.layoutYProperty());
+//            r.setLayoutX(symbol.getLayoutX()+symbol.getTranslateX());
+  //          r.setLayoutY(symbol.getLayoutY());
+            gateRow.getChildren().add(r);
+            // symbol.setMinHeight(140);
+            //  symbol.setPrefHeight(160);
+            //  symbol.setManaged(false);
 //            // we need to span more wires
 //            Oracle oracle = (Oracle)gate;
 //            int span = oracle.getQubits();
@@ -254,17 +281,6 @@ public class QubitFlow extends Region {
 //            symbol.toFront();
 //            group.setTranslateX(50 * gateRow.getChildren().size());
 //            group.getChildren().add(r);
-        }
-      //  GateSymbol symbol = GateSymbol.of(gate);
-        int spacerIndex = gateRow.getChildren().indexOf(SPACER);
-        if (spacerIndex < 0) {
-            gateRow.getChildren().add(symbol);
-        } else {
-            gateRow.getChildren().set(spacerIndex, symbol);
-        }
-        if (gate instanceof com.gluonhq.strange.gate.Measurement) {
-            measuredLine.translateXProperty().bind(symbol.layoutXProperty().add(allGates.layoutXProperty()));
-            measuredLine.setVisible(true);
         }
         return symbol;
     }

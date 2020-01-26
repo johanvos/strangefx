@@ -91,10 +91,10 @@ public class Renderer {
                 GateSymbol symbol = wire.addGate(gate);
                 if (symbol.spanWires > 1) {
                     if (gate instanceof Oracle) {
-                        multiWires.add(symbol);
-                        BoardOverlay overlay = new BoardOverlay(s, symbol);
-                        boardOverlays.add(overlay);
-                        board.addOverlay(overlay);
+//                        multiWires.add(symbol);
+//                        BoardOverlay overlay = new BoardOverlay(s, symbol);
+//                        boardOverlays.add(overlay);
+//                        board.addOverlay(overlay);
                     } else {
                         gate.getAffectedQubitIndexes().stream().filter(e -> e != qb).
                                 forEach(a -> {
@@ -122,6 +122,10 @@ public class Renderer {
                 }
             }
         }
+        for (int i = wires.size(); i >0; i--) {
+            wires.get(i-1).setViewOrder((double)i);
+        }
+
         ObservableList<Double> endStates = Model.getInstance().getEndStates();
         Qubit[] qubits = program.getResult().getQubits();
         Complex[] probability = program.getResult().getProbability();
