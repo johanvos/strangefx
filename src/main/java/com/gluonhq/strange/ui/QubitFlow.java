@@ -256,7 +256,7 @@ public class QubitFlow extends Region {
             measuredLine.setVisible(true);
         }  if (gate instanceof Oracle) {
             this.askOnTop = true;
-            Rectangle r = new Rectangle(0,0,40,symbol.spanWires * 66 -16);
+            Rectangle r = new Rectangle(0,0,40,symbol.spanWires * 70 -18);
             r.setFill(Color.GREEN);
             r.setManaged(false);
             needToFront.add(r);
