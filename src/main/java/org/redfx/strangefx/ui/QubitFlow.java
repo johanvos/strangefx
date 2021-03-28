@@ -345,6 +345,10 @@ public class QubitFlow extends Region {
         gateRow.getChildren().clear();
         intermediates.clear();
         Map<Integer, Qubit> intermediateValues = model.getIntermediateStatesByQubit(idx);
+        if (this.idx ==0) {
+            System.err.println("qubit0, iv = "+intermediateValues);
+            System.err.println("gatelist size = " + gateList.size());
+        }
         double deltax = 0;
         int iv = 0;
         for (Gate gate : gateList) {
@@ -353,6 +357,7 @@ public class QubitFlow extends Region {
                 if (gate instanceof Measurement) {
                     MeasurementUI mui = new MeasurementUI();
                     mui.setPrefHeight(STEP_WIDTH);
+                    
                     Qubit q = intermediateValues.get(iv-1);
                     if (q == null) {
                        // System.err.println("ERROR: No intermediate state possible for step "+iv);
